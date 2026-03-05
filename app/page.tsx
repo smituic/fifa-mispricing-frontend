@@ -1,58 +1,30 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { fetchMatches } from "../lib/api";
 
 export default function Home() {
-  const [matches, setMatches] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchMatches()
-      .then((data) => {
-        setMatches(data);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
   return (
-    <main className="p-10">
-      <h1 className="text-3xl font-bold mb-8">FIFA World Cup Markets</h1>
+    <main className="min-h-screen p-10">
 
-      {loading && <p>Loading matches...</p>}
+      {/* Centered title */}
+      <h1 className="text-4xl font-bold text-center mb-16">
+        Kalshi Mispricing Tracker
+      </h1>
 
-      <div className="space-y-4">
-        {matches.map((match) => (
-          <Link
-            key={match.match_id}
-            href={`/match/${match.match_id}`}
-            className="block border p-6 rounded-lg hover:bg-gray-100 transition"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-semibold">
-                  {match.team_home} vs {match.team_away}
-                </h2>
+      {/* Left aligned market box */}
+      <div className="flex justify-start">
+        <Link
+          href="/fifa"
+          className="w-72 border rounded-xl p-6 hover:bg-gray-100 transition shadow-sm"
+        >
+          <h2 className="text-xl font-semibold">
+            FIFA Markets
+          </h2>
 
-                <p className="text-sm text-gray-500">
-                  Liquidity Score: {match.liquidity_score}
-                </p>
-              </div>
-
-              <div
-                className={`text-lg font-bold ${
-                  match.top_ev > 0 ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                EV: {match.top_ev?.toFixed(3)}
-              </div>
-            </div>
-          </Link>
-        ))}
+          <p className="text-gray-500 text-sm mt-2">
+            Detect mispriced FIFA betting markets
+          </p>
+        </Link>
       </div>
+
     </main>
   );
 }
