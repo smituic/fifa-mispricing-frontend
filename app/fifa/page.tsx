@@ -8,19 +8,19 @@ export default function Home() {
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchMatches()
-      .then((data) => {
-        const sorted = data.sort(
-          (a: any, b: any) => b.top_ev - a.top_ev
-        );
+useEffect(() => {
+  fetchMatches()
+    .then((data) => {
+      const sorted = data.sort(
+        (a: any, b: any) => b.top_ev - a.top_ev
+      );
 
-        setMatches(sorted);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+      setMatches(sorted);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}, []);
 
   return (
     <main className="p-10">

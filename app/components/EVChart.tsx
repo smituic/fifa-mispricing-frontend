@@ -1,51 +1,81 @@
-"use client";
+"use client"
 
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
+  ReferenceLine
+} from "recharts"
 
-export default function EVChart({ data }: any) {
+export default function EVChart({
+  teamAData,
+  teamBData,
+  teamA,
+  teamB
+}: {
+  teamAData: any[]
+  teamBData: any[]
+  teamA: string
+  teamB: string
+}) {
+
+  const mergedData = teamAData.map((row, i) => ({
+    time: row.time,
+    evA: row.ev,
+    evB: teamBData[i]?.ev ?? null
+  }))
+
   return (
-    <div className="h-[260px] bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
 
-          <XAxis
-            dataKey="time"
-            tick={{ fill: "#9ca3af", fontSize: 12 }}
-            tickLine={false}
-            axisLine={false}
-            />
+    <ResponsiveContainer width="100%" height="100%">
 
-          <YAxis
-            tick={{ fill: "#9ca3af", fontSize: 12 }}
-            tickLine={false}
-            axisLine={false}
-            />
+      <LineChart data={mergedData}>
 
-          <Tooltip
-            contentStyle={{
-                backgroundColor: "#09090b",
-                border: "1px solid #27272a",
-            }}
-            />
+        <CartesianGrid
+          stroke="#27272a"
+          strokeDasharray="3 3"
+        />
 
-          <Line
-            type="monotone"
-            dataKey="ev"
-            stroke="#16a34a"
-            strokeWidth={2}
-            dot={false}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
+        <XAxis
+          dataKey="time"
+          stroke="#a1a1aa"
+          fontSize={12}
+        />
+
+        <YAxis
+          stroke="#a1a1aa"
+          fontSize={12}
+        />
+
+        <Tooltip />
+
+        <ReferenceLine y={0} stroke="#52525b" strokeDasharray="4 4" />
+
+        <Line
+          type="monotone"
+          dataKey="evA"
+          stroke="#3b82f6"
+          strokeWidth={2}
+          dot={false}
+          isAnimationActive={false}
+        />
+
+        <Line
+          type="monotone"
+          dataKey="evB"
+          stroke="#22c55e"
+          strokeWidth={2}
+          dot={false}
+          isAnimationActive={false}
+        />
+
+      </LineChart>
+
+    </ResponsiveContainer>
+
+  )
 }
