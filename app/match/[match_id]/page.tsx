@@ -20,6 +20,8 @@ export default async function MatchPage({
 
   const data = await response.json();
 
+  
+
   const teamNames = Object.keys(data.teams ?? {});
 
   let teamA = "";
@@ -40,6 +42,8 @@ export default async function MatchPage({
 
     latestA = teamAHistory[teamAHistory.length - 1];
     latestB = teamBHistory[teamBHistory.length - 1];
+
+
 
     teamAData = teamAHistory.map((row: any) => ({
       time: new Date(row.timestamp).toLocaleTimeString([], {
@@ -120,6 +124,45 @@ export default async function MatchPage({
 
       {/* EV CHART */}
       <div className="h-[280px] md:h-[320px] mt-10">
+        {/* TIME FILTER */}
+        <div className="flex justify-center gap-6 text-sm text-zinc-400 mt-4">
+
+        <a
+          href={`/match/${match_id}?hours=6`}
+          className={windowHours === "6" ? "text-white font-semibold" : "hover:text-white"}
+        >
+          6H
+        </a>
+
+        <a
+          href={`/match/${match_id}?hours=24`}
+          className={windowHours === "24" ? "text-white font-semibold" : "hover:text-white"}
+        >
+          24H
+        </a>
+
+        <a
+          href={`/match/${match_id}?hours=72`}
+          className={windowHours === "72" ? "text-white font-semibold" : "hover:text-white"}
+        >
+          3D
+        </a>
+
+        <a
+          href={`/match/${match_id}?hours=168`}
+          className={windowHours === "168" ? "text-white font-semibold" : "hover:text-white"}
+        >
+          7D
+        </a>
+
+        <a
+          href={`/match/${match_id}?hours=9999`}
+          className={windowHours === "9999" ? "text-white font-semibold" : "hover:text-white"}
+        >
+          ALL
+        </a>
+
+        </div>
         <EVChart
           teamAData={teamAData}
           teamBData={teamBData}
@@ -210,8 +253,8 @@ export default async function MatchPage({
             <div className="flex justify-between">
               <span>Bid</span>
               <span>
-                {latestA.implied_bid_prob
-                  ? (latestA.implied_bid_prob * 100).toFixed(1) + "%"
+                {latestA.bid_probability
+                  ? (latestA.bid_probability * 100).toFixed(1) + "%"
                   : "-"}
               </span>
             </div>
@@ -219,8 +262,8 @@ export default async function MatchPage({
             <div className="flex justify-between">
               <span>Ask</span>
               <span>
-                {latestA.implied_ask_prob
-                  ? (latestA.implied_ask_prob * 100).toFixed(1) + "%"
+                {latestA.ask_probability
+                  ? (latestA.ask_probability * 100).toFixed(1) + "%"
                   : "-"}
               </span>
             </div>
@@ -273,8 +316,8 @@ export default async function MatchPage({
             <div className="flex justify-between">
               <span>Bid</span>
               <span>
-                {latestB.implied_bid_prob
-                  ? (latestB.implied_bid_prob * 100).toFixed(1) + "%"
+                {latestB.bid_probability
+                  ? (latestB.bid_probability * 100).toFixed(1) + "%"
                   : "-"}
               </span>
             </div>
@@ -282,8 +325,8 @@ export default async function MatchPage({
             <div className="flex justify-between">
               <span>Ask</span>
               <span>
-                {latestB.implied_ask_prob
-                  ? (latestB.implied_ask_prob * 100).toFixed(1) + "%"
+                {latestB.ask_probability
+                  ? (latestB.ask_probability * 100).toFixed(1) + "%"
                   : "-"}
               </span>
             </div>

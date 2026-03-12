@@ -24,7 +24,16 @@ useEffect(() => {
 
   return (
     <main className="p-10">
-      <h1 className="text-3xl font-bold mb-8">FIFA World Cup Markets</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">FIFA World Cup Markets</h1>
+
+        <Link
+          href="/opportunities"
+          className="text-sm text-zinc-400 hover:text-white"
+        >
+          Opportunities →
+        </Link>
+      </div>
 
       {loading && <p>Loading matches...</p>}
 
@@ -49,7 +58,7 @@ useEffect(() => {
                   match.top_ev > 0 ? "text-green-600" : "text-red-600"
                 }`}
               >
-                EV: {match.top_ev?.toFixed(3)}
+                {match.top_ev ? `EV: +${(match.top_ev * 100).toFixed(2)}%` : "No edge"}
               </div>
             </div>
           </Link>
