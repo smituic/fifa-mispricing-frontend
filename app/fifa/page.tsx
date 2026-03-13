@@ -34,6 +34,13 @@ useEffect(() => {
         >
           Opportunities →
         </Link>
+
+        <Link
+          href="/movers"
+          className="text-sm text-zinc-400 hover:text-white"
+        >
+          EV Movers →
+        </Link>
       </div>
 
       {loading && <p>Loading matches...</p>}

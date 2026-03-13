@@ -23,3 +23,13 @@ export async function fetchMatchHistory(matchId: string, hours: number) {
   const data = await res.json();
   return data.matches;
 }
+
+export async function fetchEvMovers(hours = 6) {
+  const res = await fetch(
+    `http://localhost:8000/fifa/ev-movers?hours=${hours}`
+  )
+
+  const data = await res.json()
+
+  return data.movers
+}
