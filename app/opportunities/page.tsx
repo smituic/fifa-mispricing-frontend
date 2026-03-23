@@ -21,47 +21,61 @@ export default function OpportunitiesPage() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {signals.map((s: any) => (
-          <Link
-            key={`${s.match_id}-${s.team}`}
-            href={`/match/${s.match_id}`}
-            className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 transition shadow-sm"
-          >
-            {/* Match */}
-            <h2 className="text-lg font-semibold mb-2">
-              {s.match}
-            </h2>
+        {signals.map((s: any, index) => {
+          const isPositive = s.expected_value > 0;
 
-            {/* Signal */}
-            <div className="mb-3">
-              <span
-                className={`font-semibold ${
-                  s.expected_value > 0
-                    ? "text-green-400"
-                    : "text-red-400"
+          return (
+            <Link
+              key={`${s.match_id}-${s.team}`}
+              href={`/match/${s.match_id}`}
+              className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 hover:scale-[1.02] transition shadow-sm"
+            >
+              {/* 🔥 Best badge */}
+              {index === 0 && (
+                <div className="text-xs text-yellow-400 mb-2">
+                  🔥 Best Opportunity
+                </div>
+              )}
+
+              {/* Match */}
+              <h2 className="text-lg font-semibold mb-2">
+                {s.match}
+              </h2>
+
+              {/* EV (MAIN FOCUS) */}
+              <div
+                className={`text-2xl font-bold mb-3 ${
+                  isPositive ? "text-green-400" : "text-red-400"
                 }`}
               >
-                {s.expected_value > 0
-                  ? "🟢 UNDERVALUED"
-                  : "🔴 OVERVALUED"}
-              </span>
-              <span className="text-zinc-400 text-sm ml-2">
-                ({s.team})
-              </span>
-            </div>
+                {(s.expected_value * 100).toFixed(2)}%
+              </div>
 
-            {/* EV */}
-            <div className="text-2xl font-bold mb-3">
-              {(s.expected_value * 100).toFixed(2)}%
-            </div>
+              {/* Signal Badge */}
+              <div className="mb-3">
+                <span
+                  className={`px-2 py-1 text-xs rounded-full font-medium ${
+                    isPositive
+                      ? "bg-green-500/10 text-green-400"
+                      : "bg-red-500/10 text-red-400"
+                  }`}
+                >
+                  {isPositive ? "Undervalued" : "Overvalued"}
+                </span>
 
-            {/* Metrics */}
-            <div className="text-sm text-zinc-400 flex justify-between">
-              <span>Conf: {s.confidence_score?.toFixed(2)}</span>
-              <span>Liq: {s.liquidity_score?.toFixed(2)}</span>
-            </div>
-          </Link>
-        ))}
+                <span className="text-zinc-400 text-sm ml-2">
+                  ({s.team})
+                </span>
+              </div>
+
+              {/* Metrics */}
+              <div className="text-sm text-zinc-400 flex justify-between">
+                <span>Conf: {s.confidence_score?.toFixed(2)}</span>
+                <span>Liq: {s.liquidity_score?.toFixed(2)}</span>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </main>
   );
