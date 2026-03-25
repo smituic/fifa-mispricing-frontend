@@ -9,8 +9,9 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-
+import { Area } from "recharts";
 export default function ProbabilityChart({ data, latestEV }: any) {
+  console.log("probability data", data?.slice(0, 3));
   let style = {};
 
   if ((latestEV ?? 0) > 0) {
@@ -23,9 +24,20 @@ export default function ProbabilityChart({ data, latestEV }: any) {
     };
   }
   return (
-    <div className="h-[280px] md:h-[320px] mt-6 rounded-lg" style={style}>
+    <div className="w-full h-[300px] mt-6 rounded-lg">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
+          <defs>
+            <linearGradient id="kalshiGlow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+            </linearGradient>
+
+            <linearGradient id="fairGlow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#22c55e" stopOpacity={0.35} />
+              <stop offset="100%" stopColor="#22c55e" stopOpacity={0} />
+            </linearGradient>
+          </defs>
           <CartesianGrid stroke="#27272a" strokeDasharray="2 2" />
 
           <XAxis
@@ -54,24 +66,38 @@ export default function ProbabilityChart({ data, latestEV }: any) {
               border: "1px solid #27272a",
             }}
           />
+          {/* Kalshi glow */}
+         {/* Base (invisible lower bound) */}
+          <Area
+            type="monotone"
+            dataKey="lower"
+            stroke="none"
+            fill="transparent"
+          />
 
+          {/* Actual shaded gap */}
+          <Area
+            type="monotone"
+            dataKey="upper"
+            stroke="none"
+            fill="rgba(59,130,246,0.25)"   // blue tint
+          />
           {/* Kalshi (BLUE like EV chart) */}
           <Line
             type="monotone"
             dataKey="kalshi"
             stroke="#3b82f6"
-            strokeWidth={2.5}
+            strokeWidth={3}
             dot={false}
           />
 
-          {/* Fair (GREEN like EV positive tone) */}
           <Line
             type="monotone"
             dataKey="fair"
-            stroke="#22c55e"
-            strokeWidth={2.5}
+            stroke="#a3a3a3"
+            strokeWidth={2}
+            strokeDasharray="4 4"
             dot={false}
-            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>

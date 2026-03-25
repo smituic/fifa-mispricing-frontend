@@ -53,9 +53,10 @@ export default async function MatchPage({
       kalshi: row.ask_probability,
       fair: row.fair_probability,
       ev: row.expected_value,
+      gap: row.ask_probability-row.fair_probability,
     }));
 
-    teamBData = teamBHistory.map((row: any) => ({
+    teamAData = teamAHistory.map((row: any) => ({
       time: new Date(row.timestamp).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -63,6 +64,7 @@ export default async function MatchPage({
       kalshi: row.ask_probability,
       fair: row.fair_probability,
       ev: row.expected_value,
+      gap: row.ask_probability-row.fair_probability,
     }));
   }
 
