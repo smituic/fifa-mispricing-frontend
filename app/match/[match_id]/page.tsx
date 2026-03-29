@@ -45,27 +45,38 @@ export default async function MatchPage({
 
 
 
-    teamAData = teamAHistory.map((row: any) => ({
-      time: new Date(row.timestamp).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      kalshi: row.ask_probability,
-      fair: row.fair_probability,
-      ev: row.expected_value,
-      gap: row.ask_probability-row.fair_probability,
-    }));
-
-    teamAData = teamAHistory.map((row: any) => ({
-      time: new Date(row.timestamp).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      kalshi: row.ask_probability,
-      fair: row.fair_probability,
-      ev: row.expected_value,
-      gap: row.ask_probability-row.fair_probability,
-    }));
+    teamAData = teamAHistory.map((row: any) => {
+      const kalshi = row.ask_probability;
+      const fair = row.fair_probability;
+    
+      return {
+        time: new Date(row.timestamp).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        kalshi,
+        fair,
+        lower: Math.min(kalshi, fair),
+        upper: Math.max(kalshi, fair),
+        ev: row.expected_value,
+      };
+    });
+    teamBData = teamBHistory.map((row: any) => {
+      const kalshi = row.ask_probability;
+      const fair = row.fair_probability;
+    
+      return {
+        time: new Date(row.timestamp).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        kalshi,
+        fair,
+        lower: Math.min(kalshi, fair),
+        upper: Math.max(kalshi, fair),
+        ev: row.expected_value,
+      };
+    });
   }
 
   function formatProb(value: number) {
@@ -350,7 +361,7 @@ export default async function MatchPage({
     )}
     {/* PROBABILITY CHARTS */}
   {teamAData.length > 0 && teamBData.length > 0 && (
-    <div className="mt-16 space-y-12 max-w-5xl mx-auto">
+    <div className="mt-16 space-y-12 max-w-5xl mx-auto w-full">
 
       {/* TEAM A */}
       <div>

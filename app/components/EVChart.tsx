@@ -72,8 +72,8 @@ export default function EVChart({
 
   return (
     
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart
+      
+        <LineChart width={500} height={300}
           data={mergedData}
           margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
           
@@ -147,7 +147,7 @@ export default function EVChart({
 
 
         </LineChart>
-      </ResponsiveContainer>
+      
     
   );
 }
