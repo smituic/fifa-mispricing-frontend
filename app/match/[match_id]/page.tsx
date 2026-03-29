@@ -1,5 +1,6 @@
 import EVChart from "@/app/components/EVChart";
 import ProbabilityChart from "@/app/components/ProbabilityChart";
+import Link from "next/link";
 
 export default async function MatchPage({
   params,
@@ -50,9 +51,11 @@ export default async function MatchPage({
       const fair = row.fair_probability;
     
       return {
-        time: new Date(row.timestamp).toLocaleTimeString([], {
+        time: new Date(row.timestamp + "Z").toLocaleTimeString("en-US", {
           hour: "2-digit",
+          hour12: false,
           minute: "2-digit",
+          timeZone: "America/Chicago",
         }),
         kalshi,
         fair,
@@ -66,9 +69,11 @@ export default async function MatchPage({
       const fair = row.fair_probability;
     
       return {
-        time: new Date(row.timestamp).toLocaleTimeString([], {
+        time: new Date(row.timestamp + "Z").toLocaleTimeString("en-US", {
           hour: "2-digit",
+          hour12: false,
           minute: "2-digit",
+          timeZone: "America/Chicago",
         }),
         kalshi,
         fair,
@@ -88,8 +93,73 @@ export default async function MatchPage({
     return `${sign}${(value * 100).toFixed(1)}%`;
   }
 
+  const best =
+  latestA && latestB
+    ? latestA.expected_value > latestB.expected_value
+      ? { team: teamA, value: latestA.expected_value }
+      : { team: teamB, value: latestB.expected_value }
+    : null;
+
+  const hasPositive = best && best.value > 0;
+
+  const lastTime = teamAData.length > 0
+    ? teamAData[teamAData.length - 1].time
+    : null;
+
   return (
   <div className="mx-auto max-w-7xl space-y-20 px-6 py-8 md:px-8">
+
+    {/* BACK BUTTON */}
+    <div className="mb-2">
+      <Link
+        href="/fifa"
+        className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition px-3 py-1.5 rounded-md hover:bg-zinc-800/60 backdrop-blur"
+      >
+        <span className="text-lg">←</span>
+        Back to Markets
+      </Link>
+    </div>
+
+    {/* BEST OPPORTUNITY */}
+      {best && (
+        <div className="text-center mb-6">
+          
+          {/* LABEL */}
+          <div className="text-[10px] text-zinc-500 tracking-widest uppercase">
+            Best Opportunity
+          </div>
+
+          {/* VALUE */}
+          {hasPositive ? (
+            <div className="text-lg font-semibold text-emerald-400">
+              {best.team} ({formatEV(best.value)})
+            </div>
+          ) : (
+            <div className="text-lg font-semibold text-red-400">
+              No Trade Opportunity
+            </div>
+          )}
+
+        </div>
+      )}
+
+      {/* Last Updated */}
+      {lastTime && (
+        <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 mb-4">
+          
+          {/* LIVE DOT */}
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+          </span>
+
+          <span className="text-zinc-400">LIVE</span>
+
+          <span className="text-zinc-600">•</span>
+
+          <span>Last updated: {lastTime} CST</span>
+        </div>
+      )}
 
     {/* HEADER SECTION */}
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.4fr_1fr] lg:items-center">
@@ -99,6 +169,17 @@ export default async function MatchPage({
         <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
           {teamA}
         </h2>
+        <div
+          className={`mt-1 text-sm font-semibold tracking-wide ${
+            latestA?.expected_value > 0
+              ? "text-emerald-400"
+              : "text-red-400"
+          }`}
+        >
+          {latestA?.expected_value > 0
+            ? "BUY (Undervalued)"
+            : "AVOID (Overvalued)"}
+        </div>
 
         {latestA && (
           <div className="space-y-2 text-sm md:text-base">
@@ -134,9 +215,13 @@ export default async function MatchPage({
         )}
       </div>
 
+      
 
       {/* EV CHART */}
       <div className="h-[280px] md:h-[320px] mt-10">
+        <div className="text-xs text-zinc-300 text-left mb-1">
+          Expected Value Trend
+        </div>
         {/* TIME FILTER */}
         <div className="flex justify-center gap-6 text-sm text-zinc-400 mt-4">
 
@@ -190,6 +275,17 @@ export default async function MatchPage({
         <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
           {teamB}
         </h2>
+        <div
+          className={`mt-1 text-sm font-semibold tracking-wide ${
+            latestB?.expected_value > 0
+              ? "text-emerald-400"
+              : "text-red-400"
+          }`}
+        >
+          {latestB?.expected_value > 0
+            ? "BUY (Undervalued)"
+            : "AVOID (Overvalued)"}
+        </div>
 
         {latestB && (
           <div className="space-y-2 text-sm md:text-base">
@@ -361,32 +457,39 @@ export default async function MatchPage({
     )}
     {/* PROBABILITY CHARTS */}
   {teamAData.length > 0 && teamBData.length > 0 && (
-    <div className="mt-16 space-y-12 max-w-5xl mx-auto w-full">
+    <div className="mt-16 max-w-6xl mx-auto w-full">
 
-      {/* TEAM A */}
-      <div>
-        <h2 className="text-lg font-semibold mb-3 text-zinc-300">
-          {teamA} Probability
-        </h2>
-        <ProbabilityChart
-          data={teamAData}
-          latestEV={latestA?.expected_value}
-        />
+      {/* Section Title */}
+      <h2 className="text-lg font-semibold mb-6 text-zinc-300">
+        Probability Analysis
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        {/* TEAM A */}
+        <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4">
+          <h3 className="text-sm text-zinc-400 mb-2">
+            {teamA}
+          </h3>
+          <ProbabilityChart
+            data={teamAData}
+            latestEV={latestA?.expected_value}
+          />
+        </div>
+
+        {/* TEAM B */}
+        <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4">
+          <h3 className="text-sm text-zinc-400 mb-2">
+            {teamB}
+          </h3>
+          <ProbabilityChart
+            data={teamBData}
+            latestEV={latestB?.expected_value}
+          />
+        </div>
+
       </div>
-
-      {/* TEAM B */}
-      <div>
-        <h2 className="text-lg font-semibold mb-3 text-zinc-300">
-          {teamB} Probability
-        </h2>
-        <ProbabilityChart
-          data={teamBData}
-          latestEV={latestB?.expected_value}
-        />
-      </div>
-
     </div>
   )}
-
   </div>
 );}
