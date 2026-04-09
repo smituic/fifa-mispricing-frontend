@@ -66,7 +66,7 @@ useEffect(() => {
                   match.top_ev > 0 ? "text-green-600" : "text-red-600"
                 }`}
               >
-                {match.top_ev !== null? `EV: +${(match.top_ev * 100).toFixed(2)}%`: "No edge"}
+                {match.top_ev !== null? `EV: ${match.top_ev > 0 ? "+" : ""}${(match.top_ev * 100).toFixed(2)}%`: "No edge"}
 
               </div>
             </div>
