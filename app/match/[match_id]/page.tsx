@@ -46,7 +46,12 @@ export default async function MatchPage({
   const currentByTeam: Record<string, any> = {};
 
   for (const outcome of analysisOutcomes) {
-    const kalshiData = kalshiOutcomes.find((k: any) => k.team === outcome.team);
+    const kalshiData = kalshiOutcomes.find((k: any) => {
+      if (k.team === outcome.team) return true;
+      if (k.team === "Tie" && outcome.team === "Draw") return true;
+      if (k.team === "Draw" && outcome.team === "Tie") return true;
+      return false;
+    });
 
     currentByTeam[outcome.team] = {
       ...outcome,
@@ -58,8 +63,15 @@ export default async function MatchPage({
     };
   }
 
+  const drawLabel = currentByTeam["Draw"]
+    ? "Draw"
+    : currentByTeam["Tie"]
+    ? "Tie"
+    : null;
+
   const latestA = teamA ? currentByTeam[teamA] ?? null : null;
   const latestB = teamB ? currentByTeam[teamB] ?? null : null;
+  const latestDraw = drawLabel ? currentByTeam[drawLabel] ?? null : null;
 
   let teamAData: any[] = [];
   let teamBData: any[] = [];
@@ -107,20 +119,28 @@ export default async function MatchPage({
     });
   }
 
-  function formatProb(value: number) {
+  function formatProb(value: number | null | undefined) {
+    if (value == null) return "-";
     return `${(value * 100).toFixed(0)}%`;
   }
 
-  function formatEV(value: number) {
+  function formatEV(value: number | null | undefined) {
+    if (value == null) return "-";
     const sign = value > 0 ? "+" : "";
     return `${sign}${(value * 100).toFixed(1)}%`;
   }
 
+  const allCurrentOutcomes = [
+    latestA && { team: teamA, value: latestA.expected_value },
+    latestDraw && drawLabel && { team: drawLabel, value: latestDraw.expected_value },
+    latestB && { team: teamB, value: latestB.expected_value },
+  ].filter(Boolean) as { team: string; value: number }[];
+
   const best =
-    latestA && latestB
-      ? latestA.expected_value > latestB.expected_value
-        ? { team: teamA, value: latestA.expected_value }
-        : { team: teamB, value: latestB.expected_value }
+    allCurrentOutcomes.length > 0
+      ? allCurrentOutcomes.reduce((best, curr) =>
+          curr.value > best.value ? curr : best
+        )
       : null;
 
   const hasPositive = best && best.value > 0;
@@ -129,7 +149,7 @@ export default async function MatchPage({
     teamAData.length > 0 ? teamAData[teamAData.length - 1].time : null;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-20 px-6 py-8 md:px-8">
+    <div className="mx-auto max-w-7xl space-y-16 px-6 py-8 md:px-8">
       <div className="mb-2">
         <Link
           href="/fifa"
@@ -141,7 +161,7 @@ export default async function MatchPage({
       </div>
 
       {best && (
-        <div className="text-center mb-6">
+        <div className="text-center mb-2">
           <div className="text-[10px] text-zinc-500 tracking-widest uppercase">
             Best Opportunity
           </div>
@@ -159,7 +179,7 @@ export default async function MatchPage({
       )}
 
       {lastTime && (
-        <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 mb-4">
+        <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 mb-2">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
@@ -171,11 +191,13 @@ export default async function MatchPage({
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.4fr_1fr] lg:items-center">
-        <div className="space-y-3 pt-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px_1fr] lg:items-start">
+        {/* LEFT TEAM */}
+        <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
           <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
             {teamA}
           </h2>
+
           <div
             className={`mt-1 text-sm font-semibold tracking-wide ${
               latestA?.expected_value > 0 ? "text-emerald-400" : "text-red-400"
@@ -218,72 +240,72 @@ export default async function MatchPage({
           )}
         </div>
 
-        <div className="h-[280px] md:h-[320px] mt-10">
-          <div className="text-xs text-zinc-300 text-left mb-1">
-            Expected Value Trend
+        {/* DRAW / TIE */}
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 text-center">
+          <div className="text-[10px] uppercase tracking-widest text-zinc-500">
+            Third Outcome
           </div>
 
-          <div className="flex justify-center gap-6 text-sm text-zinc-400 mt-4">
-            <a
-              href={`/match/${match_id}?hours=6`}
-              className={
-                windowHours === "6" ? "text-white font-semibold" : "hover:text-white"
-              }
-            >
-              6H
-            </a>
+          <h3 className="mt-2 text-2xl font-semibold text-white">
+            {drawLabel ?? "Draw"}
+          </h3>
 
-            <a
-              href={`/match/${match_id}?hours=24`}
-              className={
-                windowHours === "24" ? "text-white font-semibold" : "hover:text-white"
-              }
-            >
-              24H
-            </a>
+          {latestDraw ? (
+            <>
+              <div
+                className={`mt-3 text-sm font-semibold tracking-wide ${
+                  latestDraw.expected_value > 0
+                    ? "text-emerald-400"
+                    : "text-red-400"
+                }`}
+              >
+                {latestDraw.expected_value > 0
+                  ? "BUY (Undervalued)"
+                  : "AVOID (Overvalued)"}
+              </div>
 
-            <a
-              href={`/match/${match_id}?hours=72`}
-              className={
-                windowHours === "72" ? "text-white font-semibold" : "hover:text-white"
-              }
-            >
-              3D
-            </a>
+              <div className="mt-4 space-y-2 text-sm">
+                <div className="flex justify-between border-b border-zinc-800 pb-2 text-zinc-400">
+                  <span>Kalshi</span>
+                  <span className="text-zinc-200">
+                    {formatProb(latestDraw.ask_probability)}
+                  </span>
+                </div>
 
-            <a
-              href={`/match/${match_id}?hours=168`}
-              className={
-                windowHours === "168" ? "text-white font-semibold" : "hover:text-white"
-              }
-            >
-              7D
-            </a>
+                <div className="flex justify-between border-b border-zinc-800 pb-2 text-zinc-400">
+                  <span>Fair</span>
+                  <span className="text-zinc-200">
+                    {formatProb(latestDraw.sportsbook_fair_probability)}
+                  </span>
+                </div>
 
-            <a
-              href={`/match/${match_id}?hours=9999`}
-              className={
-                windowHours === "9999"
-                  ? "text-white font-semibold"
-                  : "hover:text-white"
-              }
-            >
-              ALL
-            </a>
-          </div>
-
-          <EVChart
-            teamAData={teamAData}
-            teamBData={teamBData}
-            teamA={teamA}
-            teamB={teamB}
-          />
+                <div className="flex justify-between text-zinc-400">
+                  <span>EV</span>
+                  <span
+                    className={
+                      latestDraw.expected_value > 0
+                        ? "text-emerald-400"
+                        : "text-red-400"
+                    }
+                  >
+                    {formatEV(latestDraw.expected_value)}
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="mt-4 text-sm text-zinc-500">
+              No draw market data available.
+            </div>
+          )}
         </div>
 
-        <div className="space-y-3 pt-6 lg:text-right">
+        {/* RIGHT TEAM */}
+        <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:text-right">
           <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
             {teamB}
           </h2>
+
           <div
             className={`mt-1 text-sm font-semibold tracking-wide ${
               latestB?.expected_value > 0 ? "text-emerald-400" : "text-red-400"
@@ -327,125 +349,227 @@ export default async function MatchPage({
         </div>
       </div>
 
-      {latestA && latestB && (
-        <div className="grid grid-cols-2 gap-24 max-w-5xl mx-auto">
-          <div>
-            <h3 className="text-lg font-semibold mb-6">{teamA} Market Data</h3>
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5">
+        <div className="text-xs text-zinc-300 text-left mb-1">
+          Expected Value Trend
+        </div>
 
-            <div className="space-y-3 text-sm text-zinc-400">
-              <div className="flex justify-between">
-                <span>Spread</span>
-                <span>{(latestA.expected_value * 100).toFixed(2)}%</span>
-              </div>
+        <div className="flex justify-center gap-6 text-sm text-zinc-400 mt-4">
+          <a
+            href={`/match/${match_id}?hours=6`}
+            className={windowHours === "6" ? "text-white font-semibold" : "hover:text-white"}
+          >
+            6H
+          </a>
 
-              <div className="flex justify-between">
-                <span>Signal</span>
-                <span>
-                  {latestA.signal ??
-                    (latestA.expected_value > 0
-                      ? "Undervalued"
-                      : "Overvalued")}
-                </span>
-              </div>
+          <a
+            href={`/match/${match_id}?hours=24`}
+            className={windowHours === "24" ? "text-white font-semibold" : "hover:text-white"}
+          >
+            24H
+          </a>
 
-              <div className="flex justify-between">
-                <span>Liquidity</span>
-                <span>{latestA.liquidity_score?.toFixed(2) ?? "-"}</span>
-              </div>
+          <a
+            href={`/match/${match_id}?hours=72`}
+            className={windowHours === "72" ? "text-white font-semibold" : "hover:text-white"}
+          >
+            3D
+          </a>
 
-              <div className="flex justify-between">
-                <span>Confidence</span>
-                <span>{latestA.confidence_score?.toFixed(2) ?? "-"}</span>
-              </div>
+          <a
+            href={`/match/${match_id}?hours=168`}
+            className={windowHours === "168" ? "text-white font-semibold" : "hover:text-white"}
+          >
+            7D
+          </a>
 
-              <div className="flex justify-between">
-                <span>Bid</span>
-                <span>
-                  {latestA.bid_probability != null
-                    ? (latestA.bid_probability * 100).toFixed(1) + "%"
-                    : "-"}
-                </span>
-              </div>
+          <a
+            href={`/match/${match_id}?hours=9999`}
+            className={windowHours === "9999" ? "text-white font-semibold" : "hover:text-white"}
+          >
+            ALL
+          </a>
+        </div>
 
-              <div className="flex justify-between">
-                <span>Ask</span>
-                <span>
-                  {latestA.ask_probability != null
-                    ? (latestA.ask_probability * 100).toFixed(1) + "%"
-                    : "-"}
-                </span>
-              </div>
+        <div className="h-[280px] md:h-[320px] mt-4">
+          <EVChart
+            teamAData={teamAData}
+            teamBData={teamBData}
+            teamA={teamA}
+            teamB={teamB}
+          />
+        </div>
+      </div>
 
-              <div className="flex justify-between">
-                <span>Volume</span>
-                <span>{latestA.volume ?? "-"}</span>
-              </div>
+      {(latestA || latestDraw || latestB) && (
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 max-w-6xl mx-auto">
+          {latestA && (
+            <div>
+              <h3 className="text-lg font-semibold mb-6">{teamA} Market Data</h3>
 
-              <div className="flex justify-between">
-                <span>Open Interest</span>
-                <span>{latestA.open_interest ?? "-"}</span>
-              </div>
-            </div>
-          </div>
+              <div className="space-y-3 text-sm text-zinc-400">
+                <div className="flex justify-between">
+                  <span>Spread</span>
+                  <span>{(latestA.expected_value * 100).toFixed(2)}%</span>
+                </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-6">{teamB} Market Data</h3>
+                <div className="flex justify-between">
+                  <span>Signal</span>
+                  <span>{latestA.signal}</span>
+                </div>
 
-            <div className="space-y-3 text-sm text-zinc-400">
-              <div className="flex justify-between">
-                <span>Spread</span>
-                <span>{(latestB.expected_value * 100).toFixed(2)}%</span>
-              </div>
+                <div className="flex justify-between">
+                  <span>Liquidity</span>
+                  <span>{latestA.liquidity_score?.toFixed(2) ?? "-"}</span>
+                </div>
 
-              <div className="flex justify-between">
-                <span>Signal</span>
-                <span>
-                  {latestB.signal ??
-                    (latestB.expected_value > 0
-                      ? "Undervalued"
-                      : "Overvalued")}
-                </span>
-              </div>
+                <div className="flex justify-between">
+                  <span>Confidence</span>
+                  <span>{latestA.confidence_score?.toFixed(2) ?? "-"}</span>
+                </div>
 
-              <div className="flex justify-between">
-                <span>Liquidity</span>
-                <span>{latestB.liquidity_score?.toFixed(2) ?? "-"}</span>
-              </div>
+                <div className="flex justify-between">
+                  <span>Bid</span>
+                  <span>
+                    {latestA.bid_probability != null
+                      ? (latestA.bid_probability * 100).toFixed(1) + "%"
+                      : "-"}
+                  </span>
+                </div>
 
-              <div className="flex justify-between">
-                <span>Confidence</span>
-                <span>{latestB.confidence_score?.toFixed(2) ?? "-"}</span>
-              </div>
+                <div className="flex justify-between">
+                  <span>Ask</span>
+                  <span>
+                    {latestA.ask_probability != null
+                      ? (latestA.ask_probability * 100).toFixed(1) + "%"
+                      : "-"}
+                  </span>
+                </div>
 
-              <div className="flex justify-between">
-                <span>Bid</span>
-                <span>
-                  {latestB.bid_probability != null
-                    ? (latestB.bid_probability * 100).toFixed(1) + "%"
-                    : "-"}
-                </span>
-              </div>
+                <div className="flex justify-between">
+                  <span>Volume</span>
+                  <span>{latestA.volume ?? "-"}</span>
+                </div>
 
-              <div className="flex justify-between">
-                <span>Ask</span>
-                <span>
-                  {latestB.ask_probability != null
-                    ? (latestB.ask_probability * 100).toFixed(1) + "%"
-                    : "-"}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span>Volume</span>
-                <span>{latestB.volume ?? "-"}</span>
-              </div>
-
-              <div className="flex justify-between">
-                <span>Open Interest</span>
-                <span>{latestB.open_interest ?? "-"}</span>
+                <div className="flex justify-between">
+                  <span>Open Interest</span>
+                  <span>{latestA.open_interest ?? "-"}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {latestDraw && drawLabel && (
+            <div>
+              <h3 className="text-lg font-semibold mb-6">{drawLabel} Market Data</h3>
+
+              <div className="space-y-3 text-sm text-zinc-400">
+                <div className="flex justify-between">
+                  <span>Spread</span>
+                  <span>{(latestDraw.expected_value * 100).toFixed(2)}%</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Signal</span>
+                  <span>{latestDraw.signal}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Liquidity</span>
+                  <span>{latestDraw.liquidity_score?.toFixed(2) ?? "-"}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Confidence</span>
+                  <span>{latestDraw.confidence_score?.toFixed(2) ?? "-"}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Bid</span>
+                  <span>
+                    {latestDraw.bid_probability != null
+                      ? (latestDraw.bid_probability * 100).toFixed(1) + "%"
+                      : "-"}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Ask</span>
+                  <span>
+                    {latestDraw.ask_probability != null
+                      ? (latestDraw.ask_probability * 100).toFixed(1) + "%"
+                      : "-"}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Volume</span>
+                  <span>{latestDraw.volume ?? "-"}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Open Interest</span>
+                  <span>{latestDraw.open_interest ?? "-"}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {latestB && (
+            <div>
+              <h3 className="text-lg font-semibold mb-6">{teamB} Market Data</h3>
+
+              <div className="space-y-3 text-sm text-zinc-400">
+                <div className="flex justify-between">
+                  <span>Spread</span>
+                  <span>{(latestB.expected_value * 100).toFixed(2)}%</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Signal</span>
+                  <span>{latestB.signal}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Liquidity</span>
+                  <span>{latestB.liquidity_score?.toFixed(2) ?? "-"}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Confidence</span>
+                  <span>{latestB.confidence_score?.toFixed(2) ?? "-"}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Bid</span>
+                  <span>
+                    {latestB.bid_probability != null
+                      ? (latestB.bid_probability * 100).toFixed(1) + "%"
+                      : "-"}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Ask</span>
+                  <span>
+                    {latestB.ask_probability != null
+                      ? (latestB.ask_probability * 100).toFixed(1) + "%"
+                      : "-"}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Volume</span>
+                  <span>{latestB.volume ?? "-"}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Open Interest</span>
+                  <span>{latestB.open_interest ?? "-"}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

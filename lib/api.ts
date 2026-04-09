@@ -1,14 +1,16 @@
 const API_BASE = "http://localhost:8000";
 
 export async function fetchMatches() {
-  const res = await fetch(`${API_BASE}/kalshi/fifa/matches`);
+  const res = await fetch("http://localhost:8000/kalshi/fifa/matches", {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     throw new Error("Failed to fetch matches");
   }
 
   const data = await res.json();
-  return data.matches;
+  return data.matches || [];
 }
 
 export async function fetchMatchHistory(matchId: string, hours: number) {
@@ -21,7 +23,7 @@ export async function fetchMatchHistory(matchId: string, hours: number) {
   }
 
   const data = await res.json();
-  return data.matches;
+  return data.teams;
 }
 
 export async function fetchEvMovers(hours = 6) {

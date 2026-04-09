@@ -8,20 +8,22 @@ export default function Home() {
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  fetchMatches()
-    .then((data) => {
-      const sorted = data.sort(
-        (a: any, b: any) => (b.top_ev || 0) - (a.top_ev || 0)
-      );
-
-
-      setMatches(sorted);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-}, []);
+  useEffect(() => {
+    fetchMatches()
+      .then((data) => {
+        const sorted = [...data].sort(
+          (a: any, b: any) => (b.top_ev || 0) - (a.top_ev || 0)
+        );
+        setMatches(sorted);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch matches:", err);
+        setMatches([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <main className="p-10">
