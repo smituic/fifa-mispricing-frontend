@@ -68,28 +68,13 @@ export default function EVChart({
     evB: teamBData[i]?.ev ?? null,
   }));
 
-  const latest = mergedData[mergedData.length - 1];
-
   return (
-    
-      
-        <LineChart width={500} height={300}
+    <div className="h-full w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
           data={mergedData}
-          margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
-          
+          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
         >
-          <defs>
-            <linearGradient id="evABlue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.28} />
-              <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.02} />
-            </linearGradient>
-
-            <linearGradient id="evBGreen" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#22c55e" stopOpacity={0.28} />
-              <stop offset="100%" stopColor="#22c55e" stopOpacity={0.02} />
-            </linearGradient>
-          </defs>
-
           <XAxis
             dataKey="time"
             tick={{ fill: "#a1a1aa", fontSize: 11 }}
@@ -102,18 +87,13 @@ export default function EVChart({
             tick={{ fill: "#71717a", fontSize: 11 }}
             tickLine={false}
             axisLine={false}
-            width={42}
+            width={48}
             tickFormatter={(value) => formatEV(value)}
             domain={["auto", "auto"]}
           />
 
           <Tooltip
-            content={
-              <CustomTooltip
-                teamA={teamA}
-                teamB={teamB}
-              />
-            }
+            content={<CustomTooltip teamA={teamA} teamB={teamB} />}
             cursor={{ stroke: "#52525b", strokeWidth: 1 }}
           />
 
@@ -127,7 +107,6 @@ export default function EVChart({
             type="monotone"
             dataKey="evA"
             stroke="#3b82f6"
-            fill="none"
             strokeWidth={2.5}
             dot={false}
             activeDot={{ r: 4, strokeWidth: 0 }}
@@ -138,16 +117,13 @@ export default function EVChart({
             type="monotone"
             dataKey="evB"
             stroke="#22c55e"
-            fill="none"
             strokeWidth={2.5}
             dot={false}
             activeDot={{ r: 4, strokeWidth: 0 }}
             isAnimationActive={false}
           />
-
-
         </LineChart>
-      
-    
+      </ResponsiveContainer>
+    </div>
   );
 }

@@ -52,7 +52,7 @@ export default function Home() {
           <Link
             key={match.match_id}
             href={`/match/${match.match_id}`}
-            className="block border p-6 rounded-lg hover:bg-gray-100 transition"
+            className="group block rounded-2xl border border-zinc-800 bg-zinc-950/40 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/80"
           >
             <div className="flex justify-between items-center">
               <div>
