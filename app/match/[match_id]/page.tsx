@@ -130,6 +130,14 @@ export default async function MatchPage({
     return `${sign}${(value * 100).toFixed(1)}%`;
   }
 
+  function formatScore(
+    label: string | null | undefined,
+    score: number | null | undefined,
+    fallback: string
+  ) {
+    return `${label ?? fallback} (${((score ?? 0) as number).toFixed(1)} / 10)`;
+  }
+
   const allCurrentOutcomes = [
     latestA && { team: teamA, value: latestA.expected_value },
     latestDraw && drawLabel && { team: drawLabel, value: latestDraw.expected_value },
@@ -399,6 +407,12 @@ export default async function MatchPage({
         </div>
       </div>
 
+      <div className="mx-auto max-w-6xl rounded-2xl border border-zinc-800 bg-zinc-900/30 p-4 text-sm text-zinc-400">
+        <span className="text-zinc-200 font-medium">Score guide:</span>{" "}
+        Confidence measures how trustworthy the edge looks. Liquidity measures how easy the market is to trade.
+        Both are internal 0–10 scores.
+      </div>
+
       {/* MARKET DATA */}
       {(latestA || latestDraw || latestB) && (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 max-w-6xl mx-auto">
@@ -417,14 +431,18 @@ export default async function MatchPage({
                   <span>{latestA.signal}</span>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span>Liquidity</span>
-                  <span>{latestA.liquidity_score?.toFixed(2) ?? "-"}</span>
+                  <span className="text-right">
+                    {formatScore(latestA.liquidity_label, latestA.liquidity_score, "Unknown")}
+                  </span>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span>Confidence</span>
-                  <span>{latestA.confidence_score?.toFixed(2) ?? "-"}</span>
+                  <span className="text-right">
+                    {formatScore(latestA.confidence_label, latestA.confidence_score, "Unrated")}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
@@ -473,14 +491,18 @@ export default async function MatchPage({
                   <span>{latestDraw.signal}</span>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span>Liquidity</span>
-                  <span>{latestDraw.liquidity_score?.toFixed(2) ?? "-"}</span>
+                  <span className="text-right">
+                    {formatScore(latestDraw.liquidity_label, latestDraw.liquidity_score, "Unknown")}
+                  </span>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span>Confidence</span>
-                  <span>{latestDraw.confidence_score?.toFixed(2) ?? "-"}</span>
+                  <span className="text-right">
+                    {formatScore(latestDraw.confidence_label, latestDraw.confidence_score, "Unrated")}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
@@ -529,14 +551,18 @@ export default async function MatchPage({
                   <span>{latestB.signal}</span>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span>Liquidity</span>
-                  <span>{latestB.liquidity_score?.toFixed(2) ?? "-"}</span>
+                  <span className="text-right">
+                    {formatScore(latestB.liquidity_label, latestB.liquidity_score, "Unknown")}
+                  </span>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span>Confidence</span>
-                  <span>{latestB.confidence_score?.toFixed(2) ?? "-"}</span>
+                  <span className="text-right">
+                    {formatScore(latestB.confidence_label, latestB.confidence_score, "Unrated")}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
