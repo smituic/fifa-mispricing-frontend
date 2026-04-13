@@ -15,11 +15,11 @@ export default function ProbabilityChart({ data, latestEV }: any) {
   const isPositive = (latestEV ?? 0) >= 0;
 
   const shadingColor = isPositive
-    ? "rgba(34,197,94,0.3)"
-    : "rgba(239,68,68,0.3)";
+    ? "rgba(16,185,129,0.22)"
+    : "rgba(239,68,68,0.22)";
 
-  const dotColor = isPositive ? "#22c55e" : "#ef4444";
-  const dotGlow = isPositive ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)";
+  const dotColor = isPositive ? "#10b981" : "#ef4444";
+  const dotGlow = isPositive ? "rgba(16,185,129,0.34)" : "rgba(239,68,68,0.34)";
 
   const enriched = data.map((d: any) => ({
     ...d,
@@ -35,12 +35,12 @@ export default function ProbabilityChart({ data, latestEV }: any) {
   const yMax = Math.min(1, maxVal + padding);
 
   return (
-    <div className="w-full mt-6 rounded-lg bg-gradient-to-b from-zinc-900/40 to-transparent p-3">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-zinc-400 text-sm">Probability</span>
+    <div className="w-full rounded-2xl border border-white/6 bg-white/[0.03] p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="text-sm text-zinc-400">Probability</span>
         <span
           className={`text-sm font-semibold ${
-            isPositive ? "text-green-400" : "text-red-400"
+            isPositive ? "text-emerald-400" : "text-red-400"
           }`}
         >
           {(latestEV * 100).toFixed(2)}% EDGE
@@ -87,24 +87,24 @@ export default function ProbabilityChart({ data, latestEV }: any) {
               const edge = fair - kalshi;
 
               return (
-                <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm shadow-lg">
-                  <div className="text-zinc-400 mb-2">{label}</div>
+                <div className="rounded-2xl border border-white/8 bg-zinc-950/95 p-3 text-sm shadow-lg backdrop-blur">
+                  <div className="mb-2 text-zinc-400">{label}</div>
 
                   <div className="flex justify-between gap-6">
                     <span className="text-zinc-400">Kalshi</span>
-                    <span className="text-blue-400 font-medium">
+                    <span className="font-medium text-blue-400">
                       {(kalshi * 100).toFixed(2)}%
                     </span>
                   </div>
 
                   <div className="flex justify-between gap-6">
                     <span className="text-zinc-400">Fair</span>
-                    <span className="text-zinc-300 font-medium">
+                    <span className="font-medium text-zinc-300">
                       {(fair * 100).toFixed(2)}%
                     </span>
                   </div>
 
-                  <div className="border-t border-zinc-800 my-2" />
+                  <div className="my-2 border-t border-white/8" />
 
                   <div className="flex justify-between gap-6">
                     <span className="text-zinc-400">Edge</span>
@@ -148,7 +148,6 @@ export default function ProbabilityChart({ data, latestEV }: any) {
 
               return (
                 <g key={`dot-${cx}-${cy}`}>
-                  {/* Pulsing ring — color matches EV sign */}
                   <circle cx={cx} cy={cy} r={6} fill={dotGlow}>
                     <animate
                       attributeName="r"
@@ -164,7 +163,6 @@ export default function ProbabilityChart({ data, latestEV }: any) {
                     />
                   </circle>
 
-                  {/* Static center dot — color matches EV sign */}
                   <circle cx={cx} cy={cy} r={5} fill={dotColor} />
                 </g>
               );

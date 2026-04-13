@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import TopNav from "../components/TopNav";
 
 type Opportunity = {
   match_id: string;
@@ -38,12 +39,12 @@ function formatScore(
 
 function signalClasses(signal: string) {
   if (signal === "Undervalued") {
-    return "bg-emerald-500/10 text-emerald-400";
+    return "border border-emerald-400/15 bg-emerald-500/10 text-emerald-400";
   }
   if (signal === "Overvalued") {
-    return "bg-red-500/10 text-red-400";
+    return "border border-red-400/15 bg-red-500/10 text-red-400";
   }
-  return "bg-zinc-500/10 text-zinc-300";
+  return "border border-white/8 bg-zinc-500/10 text-zinc-300";
 }
 
 export default function OpportunitiesPage() {
@@ -80,20 +81,27 @@ export default function OpportunitiesPage() {
 
   return (
     <>
+      <TopNav />
+
       <main className="mx-auto max-w-7xl px-6 py-10 md:px-8">
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">
-              🔥 Top EV Opportunities
+        <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-300">
+              Ranked Opportunities
+            </div>
+
+            <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
+              Top EV Opportunities
             </h1>
 
-            <p className="mt-2 text-sm text-zinc-400">
-              Best market opportunities by match, with the strongest outcome shown for each one.
+            <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
+              The strongest current edges by match, with the most interesting
+              outcome highlighted first.
             </p>
 
             <button
               onClick={() => setScoreGuideOpen(true)}
-              className="mt-3 text-xs text-zinc-500 underline underline-offset-4 transition hover:text-zinc-300"
+              className="mt-4 text-sm text-zinc-500 underline underline-offset-4 transition hover:text-zinc-300"
             >
               How scoring works
             </button>
@@ -101,61 +109,61 @@ export default function OpportunitiesPage() {
 
           <Link
             href="/fifa"
-            className="rounded-lg border border-zinc-800 px-3 py-2 text-sm text-zinc-400 transition hover:border-zinc-700 hover:text-white"
+            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-zinc-300 hover:border-white/20 hover:bg-white/8 hover:text-white"
           >
             ← Back to Markets
           </Link>
         </div>
 
         <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
+          <div className="rounded-3xl border border-white/8 bg-white/5 p-5 backdrop-blur">
+            <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
               Best Signal
             </div>
-            <div className="mt-2 text-lg font-semibold text-emerald-400">
+            <div className="mt-3 text-lg font-semibold text-emerald-400">
               {bestPositive
-                ? `${bestPositive.match_title} · ${bestPositive.outcome_team} (${formatEV(bestPositive.expected_value)})`
+                ? `${bestPositive.match_title} · ${bestPositive.outcome_team} (${formatEV(
+                    bestPositive.expected_value
+                  )})`
                 : "No positive edge"}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
+          <div className="rounded-3xl border border-white/8 bg-white/5 p-5 backdrop-blur">
+            <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
               Positive Matches
             </div>
-            <div className="mt-2 text-lg font-semibold text-white">
+            <div className="mt-3 text-3xl font-semibold text-white">
               {data?.positive_count ?? 0}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
+          <div className="rounded-3xl border border-white/8 bg-white/5 p-5 backdrop-blur">
+            <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
               Overvalued Matches
             </div>
-            <div className="mt-2 text-lg font-semibold text-white">
+            <div className="mt-3 text-3xl font-semibold text-white">
               {data?.negative_count ?? 0}
             </div>
           </div>
         </div>
 
         {loading ? (
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 text-sm text-zinc-400">
+          <div className="rounded-3xl border border-white/8 bg-white/5 p-8 text-sm text-zinc-400 backdrop-blur">
             Loading opportunities...
           </div>
         ) : (
           <>
-            <section className="mb-14">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-white">
+            <section className="mb-16">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-white">
                   Best Opportunities
                 </h2>
-                <span className="text-sm text-zinc-500">
-                  One card per match
-                </span>
+                <span className="text-sm text-zinc-500">One card per match</span>
               </div>
 
               {positiveSignals.length === 0 ? (
-                <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 text-sm text-zinc-400">
+                <div className="rounded-3xl border border-white/8 bg-white/5 p-8 text-sm text-zinc-400 backdrop-blur">
                   No strong positive opportunities right now.
                 </div>
               ) : (
@@ -164,34 +172,32 @@ export default function OpportunitiesPage() {
                     <Link
                       key={s.match_id}
                       href={`/match/${s.match_id}`}
-                      className={`rounded-2xl border bg-zinc-900 p-5 transition hover:scale-[1.02] hover:bg-zinc-800/80 ${
+                      className={`group rounded-3xl border bg-white/5 p-6 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/[0.07] ${
                         index === 0
-                          ? "border-emerald-500/40 shadow-[0_0_0_1px_rgba(16,185,129,0.15)]"
-                          : "border-zinc-800"
+                          ? "border-emerald-500/25 shadow-[0_0_0_1px_rgba(16,185,129,0.12)]"
+                          : "border-white/8"
                       }`}
                     >
                       {index === 0 && (
-                        <div className="mb-3 text-xs font-medium uppercase tracking-widest text-emerald-400">
+                        <div className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-emerald-300">
                           Top Signal
                         </div>
                       )}
 
-                      <h3 className="mb-2 text-xl font-semibold text-white">
+                      <h3 className="mb-3 text-2xl font-semibold text-white">
                         {s.match_title}
                       </h3>
 
-                      <div className="mb-1 text-sm text-zinc-400">
-                        Best Outcome
-                      </div>
-                      <div className="mb-3 text-base font-medium text-zinc-200">
+                      <div className="mb-1 text-sm text-zinc-500">Best Outcome</div>
+                      <div className="mb-4 text-base font-medium text-zinc-200">
                         {s.outcome_team}
                       </div>
 
-                      <div className="mb-3 text-3xl font-bold text-emerald-400">
+                      <div className="mb-4 text-4xl font-semibold text-emerald-400">
                         {formatEV(s.expected_value)}
                       </div>
 
-                      <div className="mb-4 flex items-center gap-2">
+                      <div className="mb-5">
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${signalClasses(
                             s.signal
@@ -201,7 +207,7 @@ export default function OpportunitiesPage() {
                         </span>
                       </div>
 
-                      <div className="space-y-1 text-sm text-zinc-400">
+                      <div className="space-y-2 text-sm text-zinc-400">
                         <div>
                           Confidence:{" "}
                           {formatScore(
@@ -226,8 +232,8 @@ export default function OpportunitiesPage() {
             </section>
 
             <section>
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-white">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-white">
                   Avoid / Overvalued
                 </h2>
                 <span className="text-sm text-zinc-500">
@@ -236,7 +242,7 @@ export default function OpportunitiesPage() {
               </div>
 
               {negativeSignals.length === 0 ? (
-                <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 text-sm text-zinc-400">
+                <div className="rounded-3xl border border-white/8 bg-white/5 p-8 text-sm text-zinc-400 backdrop-blur">
                   No overvalued matches right now.
                 </div>
               ) : (
@@ -245,24 +251,24 @@ export default function OpportunitiesPage() {
                     <Link
                       key={s.match_id}
                       href={`/match/${s.match_id}`}
-                      className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5 transition hover:scale-[1.01] hover:bg-zinc-800/70"
+                      className="group rounded-3xl border border-white/8 bg-white/5 p-6 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/[0.07]"
                     >
-                      <h3 className="mb-2 text-lg font-semibold text-white">
+                      <h3 className="mb-3 text-2xl font-semibold text-white">
                         {s.match_title}
                       </h3>
 
-                      <div className="mb-1 text-sm text-zinc-400">
+                      <div className="mb-1 text-sm text-zinc-500">
                         Most Overvalued Outcome
                       </div>
-                      <div className="mb-3 text-base font-medium text-zinc-200">
+                      <div className="mb-4 text-base font-medium text-zinc-200">
                         {s.outcome_team}
                       </div>
 
-                      <div className="mb-3 text-2xl font-bold text-red-400">
+                      <div className="mb-4 text-3xl font-semibold text-red-400">
                         {formatEV(s.expected_value)}
                       </div>
 
-                      <div className="mb-4 flex items-center gap-2">
+                      <div className="mb-5">
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${signalClasses(
                             s.signal
@@ -272,7 +278,7 @@ export default function OpportunitiesPage() {
                         </span>
                       </div>
 
-                      <div className="space-y-1 text-sm text-zinc-500">
+                      <div className="space-y-2 text-sm text-zinc-500">
                         <div>
                           Confidence:{" "}
                           {formatScore(
@@ -305,7 +311,7 @@ export default function OpportunitiesPage() {
           onClick={() => setScoreGuideOpen(false)}
         >
           <div
-            className="relative w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl"
+            className="relative w-full max-w-lg rounded-3xl border border-white/8 bg-zinc-950 p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -317,7 +323,7 @@ export default function OpportunitiesPage() {
             </button>
 
             <div className="pr-8">
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-xl font-semibold text-white">
                 How scoring works
               </h2>
 
