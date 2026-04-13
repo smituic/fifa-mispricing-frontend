@@ -14,6 +14,8 @@ type MatchRow = {
   best_signal: string;
 };
 
+type SortOption = "top_ev" | "alphabetical" | "positive_first";
+
 function formatEV(value: number | null) {
   if (value === null || value === undefined) return "No edge";
   const sign = value > 0 ? "+" : "";
@@ -39,14 +41,13 @@ function signalClasses(signal: string, topEv: number | null) {
 export default function FifaMarketsPage() {
   const [matches, setMatches] = useState<MatchRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<SortOption>("top_ev");
+  const [positiveOnly, setPositiveOnly] = useState(false);
 
   useEffect(() => {
     fetchMatches()
       .then((data) => {
-        const sorted = [...data].sort(
-          (a: MatchRow, b: MatchRow) => (b.top_ev || 0) - (a.top_ev || 0)
-        );
-        setMatches(sorted);
+        setMatches(data ?? []);
       })
       .catch((err) => {
         console.error("Failed to fetch matches:", err);
@@ -61,7 +62,10 @@ export default function FifaMarketsPage() {
     const positive = matches.filter(
       (m) => m.top_ev !== null && m.top_ev !== undefined && m.top_ev > 0
     );
-    const strongest = positive[0] ?? null;
+
+    const strongest = [...positive].sort(
+      (a, b) => (b.top_ev || 0) - (a.top_ev || 0)
+    )[0] ?? null;
 
     return {
       total: matches.length,
@@ -69,6 +73,40 @@ export default function FifaMarketsPage() {
       strongest,
     };
   }, [matches]);
+
+  const filteredMatches = useMemo(() => {
+    let next = [...matches];
+
+    if (positiveOnly) {
+      next = next.filter(
+        (m) => m.top_ev !== null && m.top_ev !== undefined && m.top_ev > 0
+      );
+    }
+
+    if (sortBy === "top_ev") {
+      next.sort((a, b) => (b.top_ev || 0) - (a.top_ev || 0));
+    }
+
+    if (sortBy === "alphabetical") {
+      next.sort((a, b) =>
+        `${a.home_team} vs ${a.away_team}`.localeCompare(
+          `${b.home_team} vs ${b.away_team}`
+        )
+      );
+    }
+
+    if (sortBy === "positive_first") {
+      next.sort((a, b) => {
+        const aPositive = (a.top_ev || 0) > 0 ? 1 : 0;
+        const bPositive = (b.top_ev || 0) > 0 ? 1 : 0;
+
+        if (bPositive !== aPositive) return bPositive - aPositive;
+        return (b.top_ev || 0) - (a.top_ev || 0);
+      });
+    }
+
+    return next;
+  }, [matches, positiveOnly, sortBy]);
 
   return (
     <>
@@ -86,8 +124,8 @@ export default function FifaMarketsPage() {
             </h1>
 
             <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
-              Monitor current match markets, scan for edge, and jump into the most
-              interesting opportunities without digging through raw prices.
+              Monitor current match markets, scan for edge, and jump into the
+              most interesting opportunities without digging through raw prices.
             </p>
           </div>
         </div>
@@ -119,10 +157,43 @@ export default function FifaMarketsPage() {
               {loading
                 ? "Loading..."
                 : stats.strongest
-                ? `${stats.strongest.home_team} vs ${stats.strongest.away_team} · ${formatEV(
-                    stats.strongest.top_ev
-                  )}`
+                ? `${stats.strongest.home_team} vs ${
+                    stats.strongest.away_team
+                  } · ${formatEV(stats.strongest.top_ev)}`
                 : "No positive edge"}
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-white/8 bg-white/5 p-4 backdrop-blur md:flex-row md:items-center md:justify-between">
+          <div className="text-sm text-zinc-400">
+            Showing{" "}
+            <span className="font-medium text-white">{filteredMatches.length}</span>{" "}
+            {filteredMatches.length === 1 ? "match" : "matches"}
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <label className="flex items-center gap-2 text-sm text-zinc-300">
+              <input
+                type="checkbox"
+                checked={positiveOnly}
+                onChange={(e) => setPositiveOnly(e.target.checked)}
+                className="h-4 w-4 rounded border-white/10 bg-zinc-900 text-white"
+              />
+              Positive edges only
+            </label>
+
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-zinc-500">Sort by</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="rounded-2xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-white outline-none transition hover:border-white/20"
+              >
+                <option value="top_ev">Top EV</option>
+                <option value="alphabetical">Match A–Z</option>
+                <option value="positive_first">Positive Edge First</option>
+              </select>
             </div>
           </div>
         </div>
@@ -139,9 +210,13 @@ export default function FifaMarketsPage() {
               </div>
             ))}
           </div>
+        ) : filteredMatches.length === 0 ? (
+          <div className="rounded-3xl border border-white/8 bg-white/5 p-8 text-sm text-zinc-400 backdrop-blur">
+            No matches found for the selected filters.
+          </div>
         ) : (
           <div className="space-y-4">
-            {matches.map((match) => (
+            {filteredMatches.map((match) => (
               <Link
                 key={match.match_id}
                 href={`/match/${match.match_id}`}
@@ -165,8 +240,8 @@ export default function FifaMarketsPage() {
                     </div>
 
                     <p className="mt-3 text-sm text-zinc-500">
-                      Click through for EV trend, outcome breakdown, liquidity, and
-                      confidence context.
+                      Click through for EV trend, outcome breakdown, liquidity,
+                      and confidence context.
                     </p>
                   </div>
 
