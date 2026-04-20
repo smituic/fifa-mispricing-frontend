@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { fetchOpportunities } from "@/lib/api";
 import TopNav from "../components/TopNav";
 
 type Opportunity = {
@@ -53,10 +54,7 @@ export default function OpportunitiesPage() {
   const [scoreGuideOpen, setScoreGuideOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8000/kalshi/fifa/opportunities", {
-      cache: "no-store",
-    })
-      .then((res) => res.json())
+    fetchOpportunities()
       .then((json) => {
         setData(json);
       })

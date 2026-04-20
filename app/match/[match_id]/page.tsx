@@ -2,6 +2,7 @@ import EVChart from "@/app/components/EVChart";
 import ProbabilityChart from "@/app/components/ProbabilityChart";
 import TopNav from "@/app/components/TopNav";
 import Link from "next/link";
+import { fetchMatchDetail } from "@/lib/api";
 
 export default async function MatchPage({
   params,
@@ -15,19 +16,8 @@ export default async function MatchPage({
 
   const windowHours = hours ?? "6";
 
-  const [historyResponse, detailResponse] = await Promise.all([
-    fetch(
-      `http://localhost:8000/kalshi/fifa/match/${match_id}/history?hours=${windowHours}`,
-      { cache: "no-store" }
-    ),
-    fetch(`http://localhost:8000/kalshi/fifa/match/${match_id}`, {
-      cache: "no-store",
-    }),
-  ]);
-
-  const historyData = await historyResponse.json();
-  const detailData = await detailResponse.json();
-
+  const { historyData, detailData } = await fetchMatchDetail(match_id, windowHours);
+  
   let teamA = "";
   let teamB = "";
 
