@@ -21,13 +21,7 @@ function formatEV(value: number) {
   return `${sign}${(value * 100).toFixed(1)}%`;
 }
 
-function CustomTooltip({
-  active,
-  payload,
-  label,
-  teamA,
-  teamB,
-}: any) {
+function CustomTooltip({ active, payload, label, teamA, teamB }: any) {
   if (!active || !payload || !payload.length) return null;
 
   const evA = payload.find((item: any) => item.dataKey === "evA")?.value;
@@ -69,10 +63,17 @@ export default function EVChart({
     evB: teamBData[i]?.ev ?? null,
   }));
 
-  if (!mergedData.length) {
+  // Need at least 2 points to draw a line. With 0 or 1 snapshot in the
+  // window (common for newly-tracked matches on the 2-hour snapshot cadence),
+  // show an explicit message instead of an empty chart frame that looks broken.
+  if (mergedData.length < 2) {
     return (
-      <div className="flex h-[260px] items-center justify-center text-sm text-zinc-500">
-        No EV history available for this window.
+      <div className="flex h-[260px] flex-col items-center justify-center gap-2 text-center text-sm text-zinc-500">
+        <span>Not enough history yet for this window.</span>
+        <span className="text-xs text-zinc-600">
+          Try a longer window (7D or ALL), or check back later as more snapshots
+          are collected.
+        </span>
       </div>
     );
   }
