@@ -41,6 +41,21 @@ export default async function MatchPage({
     teamB = historyTeamNames[1];
   }
 
+  // Home/Away labels come from the backend's authoritative home_team/away_team,
+  // not title order. Kalshi MLB titles are away-first, so labeling teamA (away)
+  // as "Home" was wrong. Falls back to positional labels if the backend doesn't
+  // supply home/away (e.g. FIFA), leaving FIFA unchanged.
+  const homeTeam: string | null = detailData?.home_team ?? null;
+  const awayTeam: string | null = detailData?.away_team ?? null;
+
+  function outcomeLabel(teamName: string, fallback: string): string {
+    if (!homeTeam || !awayTeam) return fallback;
+    const norm = (s: string) => s.trim().toLowerCase();
+    if (norm(teamName) === norm(homeTeam)) return "Home Outcome";
+    if (norm(teamName) === norm(awayTeam)) return "Away Outcome";
+    return fallback;
+  }
+
   const kalshiOutcomes = detailData?.kalshi?.outcomes ?? [];
   const analysisOutcomes = detailData?.analysis?.outcomes ?? [];
 
@@ -393,7 +408,7 @@ export default async function MatchPage({
         <div className={`mb-10 grid grid-cols-1 gap-6 ${outcomeGridClass}`}>
           <div className="rounded-3xl border border-white/8 bg-white/5 p-6 backdrop-blur">
             <div className="text-sm uppercase tracking-[0.18em] text-zinc-500">
-              Home Outcome
+              {outcomeLabel(teamA, "Home Outcome")}
             </div>
             <h2 className="mt-4 text-3xl font-semibold text-white">{teamA}</h2>
 
@@ -478,7 +493,7 @@ export default async function MatchPage({
 
           <div className="rounded-3xl border border-white/8 bg-white/5 p-6 backdrop-blur lg:text-right">
             <div className="text-sm uppercase tracking-[0.18em] text-zinc-500">
-              Away Outcome
+              {outcomeLabel(teamB, "Away Outcome")}
             </div>
             <h2 className="mt-4 text-3xl font-semibold text-white">{teamB}</h2>
 
