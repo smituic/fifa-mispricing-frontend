@@ -54,20 +54,21 @@ export default function TopNav({ sport }: { sport: Sport }) {
               <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-white/8 bg-zinc-950/95 p-1 shadow-2xl backdrop-blur">
                 {SPORTS.map((s) => {
                   const isCurrent = s.key === sport;
-                  const isLive = s.status === "live";
+                  const isOpenable =
+                    s.status === "live" || s.status === "archive";
                   return (
                     <Link
                       key={s.key}
-                      href={isLive ? `/sport/${s.key}` : "#"}
+                      href={isOpenable ? `/sport/${s.key}` : "#"}
                       className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition ${
                         isCurrent
                           ? "bg-white/8 text-white"
-                          : isLive
+                          : isOpenable
                             ? "text-zinc-300 hover:bg-white/6 hover:text-white"
                             : "cursor-not-allowed text-zinc-600"
                       }`}
                       onClick={(e) => {
-                        if (!isLive) e.preventDefault();
+                        if (!isOpenable) e.preventDefault();
                       }}
                     >
                       <span className="flex items-center gap-2">
@@ -78,7 +79,11 @@ export default function TopNav({ sport }: { sport: Sport }) {
                         <span className="text-[10px] uppercase tracking-wider text-emerald-300">
                           Current
                         </span>
-                      ) : !isLive ? (
+                      ) : s.status === "archive" ? (
+                        <span className="text-[10px] uppercase tracking-wider text-blue-300">
+                          Archive
+                        </span>
+                      ) : !isOpenable ? (
                         <span className="text-[10px] uppercase tracking-wider text-zinc-600">
                           Soon
                         </span>

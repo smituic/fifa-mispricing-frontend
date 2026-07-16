@@ -28,6 +28,10 @@ export default function Home() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {SPORTS.map((sport) => {
             const isLive = sport.status === "live";
+            // Archived sports have no live markets but do have stored history,
+            // so their pages stay reachable — just badged differently.
+            const isArchive = sport.status === "archive";
+            const isOpenable = isLive || isArchive;
             const badge = (
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${
@@ -47,7 +51,7 @@ export default function Home() {
             const cardInner = (
               <div
                 className={`group relative flex h-full flex-col rounded-3xl border border-white/8 bg-white/5 p-6 backdrop-blur transition ${
-                  isLive
+                  isOpenable
                     ? "hover:border-white/20 hover:bg-white/[0.08] cursor-pointer"
                     : "opacity-60"
                 }`}
@@ -77,6 +81,10 @@ export default function Home() {
                     <span className="text-white group-hover:translate-x-0.5 transition-transform">
                       Open {sport.shortName} →
                     </span>
+                  ) : isArchive ? (
+                    <span className="text-blue-300 group-hover:translate-x-0.5 transition-transform">
+                      View archive →
+                    </span>
                   ) : (
                     <span className="text-zinc-500">Not available yet</span>
                   )}
@@ -84,7 +92,7 @@ export default function Home() {
               </div>
             );
 
-            return isLive ? (
+            return isOpenable ? (
               <Link key={sport.key} href={`/sport/${sport.key}`}>
                 {cardInner}
               </Link>
