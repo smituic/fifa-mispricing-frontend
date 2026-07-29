@@ -22,7 +22,7 @@ export const SPORTS: SportMeta[] = [
     name: "FIFA World Cup",
     shortName: "FIFA",
     icon: "⚽",
-    status: "live",
+    status: "archive",
     tagline: "World Cup 2026 markets, live now.",
     statusDetail: "Through July 19, 2026",
   },
