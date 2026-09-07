@@ -35,6 +35,15 @@ export const SPORTS: SportMeta[] = [
     tagline: "Daily moneyline edges across the league.",
     statusDetail: "Regular season",
   },
+  {
+    key: "nfl",
+    name: "NFL",
+    shortName: "NFL",
+    icon: "🏈",
+    status: "coming_soon",
+    tagline: "Regular season kicks off September 9.",
+    statusDetail: "Coming September 9, 2026",
+  },
 ];
 
 export const STATUS_LABELS: Record<SportStatus, string> = {

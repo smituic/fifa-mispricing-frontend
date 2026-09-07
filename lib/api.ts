@@ -8,7 +8,7 @@ export const API_BASE =
 // Supported sports. Add new sports here as the backend gains them
 // (the backend SPORTS_CONFIG is the source of truth; this mirrors it for
 // type safety on the frontend).
-export type Sport = "fifa" | "mlb";
+export type Sport = "fifa" | "mlb" | "nfl";
 
 export const DEFAULT_SPORT: Sport = "fifa";
 
