@@ -40,7 +40,7 @@ export const SPORTS: SportMeta[] = [
     name: "NFL",
     shortName: "NFL",
     icon: "🏈",
-    status: "coming_soon",
+    status: "live",
     tagline: "Regular season kicks off September 9.",
     statusDetail: "Coming September 9, 2026",
   },
